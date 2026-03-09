@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: 22
       - name: Install deps
-        run: npm install -y && npm ci 
+        run: npm install --no-audit --no-fund 
       - name: Build site
         run: npm run build
       - name: Deploy to GitHub Pages
