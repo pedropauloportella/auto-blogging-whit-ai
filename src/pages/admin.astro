@@ -1,0 +1,51 @@
+---
+<!-- Minimal admin page skeleton (Astro) -->
+---
+<html>
+  <head><meta charset="utf-8"/><title>Admin</title></head>
+  <body>
+    <h1>Admin</h1>
+    <div id="app"></div>
+    <script type="module">
+      // simple SPA admin client
+      async function login(e){
+        e.preventDefault();
+        const username = document.getElementById('user').value;
+        const password = document.getElementById('pw').value;
+        const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password })});
+        if (r.ok){ const j=await r.json(); localStorage.setItem('token', j.token); alert('Logged'); location.reload(); }
+        else alert('Login failed');
+      }
+      async function generate(){
+        const topics = document.getElementById('topics').value.split(',').map(s=>s.trim());
+        const sources = document.getElementById('sources').value.split(',').map(s=>s.trim()).filter(Boolean);
+        const lang = document.getElementById('lang').value;
+        const token = localStorage.getItem('token');
+        const r = await fetch('/api/generate', { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+token }, body: JSON.stringify({ topics, sources, lang })});
+        const j = await r.json();
+        if (r.ok) { document.getElementById('preview').textContent = j.preview; document.getElementById('draftId').value = j.id; }
+        else alert(JSON.stringify(j));
+      }
+      async function publish(){
+        const token = localStorage.getItem('token');
+        const id = document.getElementById('draftId').value;
+        const r = await fetch('/api/publish', { method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+token }, body: JSON.stringify({ draftId: id })});
+        const j = await r.json();
+        alert(JSON.stringify(j));
+      }
+      document.addEventListener('DOMContentLoaded', ()=>{
+        document.body.innerHTML += `
+          <form onsubmit="login(event)"><input id="user" placeholder="user"/><input id="pw" placeholder="pw" type="password"/><button>Login</button></form>
+          <hr/>
+          <textarea id="topics" placeholder="topics comma separated"></textarea><br/>
+          <input id="sources" placeholder="sources (comma)"/><br/>
+          <select id="lang"><option value="pt">Português</option><option value="en">English</option></select>
+          <button onclick="generate()">Generate</button>
+          <input id="draftId" readonly style="width:400px"/>
+          <button onclick="publish()">Publish</button>
+          <pre id="preview" style="white-space:pre-wrap;background:#f6f6f6;padding:10px;margin-top:10px;"></pre>
+        `;
+      });
+    </script>
+  </body>
+</html>
