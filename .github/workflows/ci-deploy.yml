@@ -12,7 +12,11 @@ jobs:
         with:
           node-version: 22
       - name: Clean cache
-        run: npm cache clean --force &&  rm -rf node_modules package-lock.json && echo "Passei por aqui paizão!"
+        run: npm cache clean --force 
+      - name: Remove node_modules
+        run: rm -rf node_modules package-lock.json
+      - name: Debug
+        run: echo "Passei por aqui paizão!"
         
       - name: Install deps
         run: npm install --no-audit --no-fund --prefer-online
