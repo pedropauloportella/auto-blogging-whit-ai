@@ -11,8 +11,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Clean cache
+        run: npm cache clean --force &&  rm -rf node_modules package-lock.json
+        
       - name: Install deps
-        run: npm install --no-audit --no-fund 
+        run: npm install --no-audit --no-fund
+        
       - name: Build site
         run: npm run build
       - name: Deploy to GitHub Pages
